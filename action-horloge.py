@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 from datetime import datetime
 from pytz import timezone
 import paho.mqtt.client as paho
