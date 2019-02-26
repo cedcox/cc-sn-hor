@@ -37,18 +37,18 @@ def verbalise_minute(i):
 
 def intent_received(hermes, intent_message):
 
-	if intent_message.intent.intent_name == 'cedcox:askTime':
-		sentence = 'Il est '
-	        print(intent_message.intent.intent_name)
+    if intent_message.intent.intent_name == 'cedcox:askTime':
+        sentence = 'Il est '
+        print(intent_message.intent.intent_name)
 
-		now = datetime.now(timezone('Europe/Paris'))
+        now = datetime.now(timezone('Europe/Paris'))
 
-		sentence += verbalise_hour(now.hour) + " " + verbalise_minute(now.minute)
+        sentence += verbalise_hour(now.hour) + " " + verbalise_minute(now.minute)
   	      
-		print(sentence)
+        print(sentence)
 
-		# hermes.publish_continue_session(intent_message.session_id, sentence, ["Joseph:greetings"])
-		hermes.publish_end_session(intent_message.session_id, sentence)
+        # hermes.publish_continue_session(intent_message.session_id, sentence, ["Joseph:greetings"])
+        hermes.publish_end_session(intent_message.session_id, sentence)
 
 
 with Hermes(MQTT_ADDR) as h:
