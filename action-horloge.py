@@ -1,8 +1,7 @@
 #!/usr/bin/env python3
+from hermes_python.hermes import Hermes
 from datetime import datetime
 from pytz import timezone
-import paho.mqtt.client as paho
-import json
 
 MQTT_IP_ADDR = "localhost"
 MQTT_PORT = 1883
@@ -36,35 +35,21 @@ def verbalise_minute(i):
 	else:
 		return "{0}".format(str(i)) 
 
-def on_connect(client, userdata, flags, rc):
-    print("Connected to {0} with result code {1}".format(MQTT_IP_ADDR, rc))
-    client.subscribe('hermes/intent/cedcox:askTime')
-
-def on_message(client, userdata, msg):
-    print("Message received on topic {0}: {1}"\
-        .format(msg.topic, msg.payload))
-    
-    payload = json.loads(msg.payload)
-    name = payload["intent"]["intentName"]
-    slots = payload["slots"]
-    sessionId = payload["sessionId"]
-
-    print("Intent {0} detected with slots {1} and seesionId {2}"\
-        .format(name, slots, sessionId))
-    
-    sentence = 'Il est '
-
-    now = datetime.now(timezone('Europe/Paris'))
-
-    sentence += verbalise_hour(now.hour) + verbalise_minute(now.minute)
-    print(sentence)
-
-    monjson=json.dumps({"sessionId": sessionId,"text": sentence})
-    client.publish("hermes/dialogueManager/endSession",monjson)#publish
+def intent_received(hermes, intent_message):
 
 
-client = paho.Client()
-client.on_connect = on_connect
-client.on_message = on_message
-client.connect(MQTT_IP_ADDR, MQTT_PORT, 60)
-client.loop_forever()
+        sentence = 'Il est '
+        print(intent_message.intent.intent_name)
+
+        now = datetime.now(timezone('Europe/Paris'))
+
+        sentence += verbalise_hour(now.hour) + " " + verbalise_minute(now.minute)
+        print(sentence)
+
+        # hermes.publish_continue_session(intent_message.session_id, sentence, ["Joseph:greetings"])
+        hermes.publish_end_session(intent_message.session_id, sentence)
+
+
+with Hermes(MQTT_ADDR) as h:
+        h.subscribe_intents(intent_received).start()
+
