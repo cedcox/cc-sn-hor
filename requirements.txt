@@ -1,2 +1,2 @@
 pytz
-paho-mqtt
+hermes_python
